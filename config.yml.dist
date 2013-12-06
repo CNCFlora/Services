@@ -1,0 +1,6 @@
+development:
+    couchdb: "http://localhost:5984/cncflora"
+test:
+    couchdb: "http://localhost:5984/cncflora_test"
+production:
+    couchdb: "http://tester:tester@localhost:5984/cncflora"
