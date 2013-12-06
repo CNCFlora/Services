@@ -1,5 +1,5 @@
 
-db = CouchDB.new ENV['couchdb'] || Sinatra::Application.settings.couchdb
+db = CouchDB.new ENV['COUCHDB'] || Sinatra::Application.settings.couchdb
 
 @api = {
     :apiVersion=>"0.0.1",

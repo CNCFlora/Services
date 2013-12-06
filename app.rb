@@ -10,7 +10,7 @@ if development? || test?
     also_reload "couchdb.rb"
 end
 
-config_file ENV['config'] || 'config.yml'
+config_file ENV['CONFIG'] || 'config.yml'
 
 require_relative 'couchdb'
 require_relative 'api'
@@ -18,7 +18,7 @@ require_relative 'api'
 api = @api
 
 get '/' do
-    mustache :index, {}, {:url=> (ENV['url'] || settings.url)+"/api-docs"}
+    mustache :index, {}, {:url=> (ENV['BASE_URL'] || settings.base_url)+"/api-docs"}
 end
 
 get '/api-docs' do

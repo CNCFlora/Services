@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #service nginx start
-$USER=cncflora
-su $USER -c 'cd ~/www && nohup rackup &'
+APP_USER=cncflora
+su $APP_USER -c 'cd ~/www && CONFIG=/root/config.yml RACK_ENV=production nohup rackup &'
 
 /usr/sbin/sshd -D
 

@@ -1,6 +1,9 @@
 development:
+    base_url: "http://localhost:9494"
     couchdb: "http://localhost:5984/cncflora"
 test:
+    base_url: "http://localhost:9292"
     couchdb: "http://localhost:5984/cncflora_test"
 production:
-    couchdb: "http://tester:tester@localhost:5984/cncflora"
+    base_url: "http://services.jbrj.gov.br"
+    couchdb: "http://146.134.16.15:5984/cncflora"

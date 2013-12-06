@@ -3,15 +3,15 @@
 FROM stackbrew/ubuntu:raring
 MAINTAINER Diogo "kid" <diogo@diogok.net>
 
-ENV USER cncflora 
-ENV PASS cncflora
+ENV APP_USER cncflora 
+ENV APP_PASS cncflora
 
-RUN useradd -g users -s /bin/bash -m $USER
-RUN echo $USER:$PASS | chpasswd
+RUN useradd -g users -s /bin/bash -m $APP_USER
+RUN echo $APP_USER:$APP_PASS | chpasswd
 
 RUN cp /etc/apt/sources.list /etc/apt/sources.list.bkp && sed -e 's/http/ftp/g' /etc/apt/sources.list.bkp > /etc/apt/sources.list
 RUN apt-get update -y
-RUN apt-get install ruby curl git vim openssh-server -y
+RUN apt-get install ruby1.9.3 curl git vim openssh-server tmux -y
 
 RUN mkdir /var/run/sshd 
 
@@ -23,13 +23,14 @@ RUN mkdir /var/run/sshd
 RUN gem sources -r http://rubygems.org/ && gem sources -r http://rubygems.org && gem sources -a https://rubygems.org
 RUN gem install bundler
 
-RUN cd /home/$USER/ && su $USER -c git clone https://github.com/CNCFlora/Services.git www
-RUN cd /home/$USER/www && su $USER -c 'bundle install' 
+RUN cd /home/$APP_USER/ && su $APP_USER -c 'git clone https://github.com/CNCFlora/Services.git www'
+RUN cd /home/$APP_USER/www && bundle install
 
 EXPOSE 22
 #EXPOSE 80
 EXPOSE 8080
 
+ADD config.yml /root/config.yml
 ADD start.sh /root/start.sh
 RUN chmod +x /root/start.sh
 
