@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker run -p 8080:8080 -p 2222:22 -t cncflora/services /root/start.sh
+docker run -p 8181:9292 -p 2424:22 -t cncflora/services /root/start.sh
 
