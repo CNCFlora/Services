@@ -1,5 +1,6 @@
 
 db = CouchDB.new ENV['COUCHDB'] || Sinatra::Application.settings.couchdb
+es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
 
 @api = {
     :apiVersion=>"0.0.1",
@@ -13,7 +14,39 @@ db = CouchDB.new ENV['COUCHDB'] || Sinatra::Application.settings.couchdb
         :license=>"CC-BY-NC",
         :licenseUrl=>"http://creativecommons.org/licenses/by-nc/4.0/"
     },
+    :models=> {
+        "Assessment"=> MultiJson.load(db.get("_design/assessments")[:schema][:assessment][27..-4], :symbolize_keys=>true)
+    },
     :apis=>[
+        {
+            :path=>"/search",
+            :description=>"Search",
+            :apis=>[
+                {
+                    :path=>"/search/all",
+                    :operations=>[
+                        {
+                            :method=>"GET",
+                            :summary=>"General search",
+                            :nickname=>"search",
+                            :parameters=>[
+                                {
+                                    :name=>"q",
+                                    :description=>"query",
+                                    :required=>true,
+                                    :type=>"string",
+                                    :paramType=>"query"
+                                }
+                            ],
+                            :execute=>Proc.new{|params|
+                                r = RestClient.get "#{es}/_search?q=#{params.q}"
+                                MultiJson.load(r.to_str, :symbolize_keys => true)[:hits][:hits]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
         {
             :path=>'/assessments',
             :description=>"Retrieve assessments",
@@ -23,6 +56,7 @@ db = CouchDB.new ENV['COUCHDB'] || Sinatra::Application.settings.couchdb
                     :operations=>[
                          {
                              :method=>"GET",
+                             :type=>"Assessment",
                              :summary=>"Return published assessments for given family",
                              :nickname=>"assessmentsByFamily",
                              :parameters=>[
@@ -49,6 +83,7 @@ db = CouchDB.new ENV['COUCHDB'] || Sinatra::Application.settings.couchdb
                              :method=>"GET",
                              :summary=>"Return published assessment for taxon",
                              :nickname=>"assessmentForTaxon",
+                             :type=>"Assessment",
                              :parameters=>[
                                  {
                                     :name=>"taxon",

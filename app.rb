@@ -31,10 +31,10 @@ get '/api-docs/:path' do
     re = {
         :apiVersion=>api[:apiVersion],
         :swaggerVersion=>api[:swaggerVersion],
-        :basePath=>settings.url,
+        :basePath=>ENV['BASE_URL'] || settings.base_url,
         :resourcePath=>"/#{params[:path]}",
         :produces=>["application/json"],
-        :models=>{},
+        :models=>api[:models],
         :apis=>[]
 
     }
