@@ -23,12 +23,11 @@ RUN mkdir /var/run/sshd
 RUN gem sources -r http://rubygems.org/ && gem sources -r http://rubygems.org && gem sources -a https://rubygems.org
 RUN gem install bundler
 
+EXPOSE 22
+EXPOSE 9292
+
 RUN cd /home/$APP_USER/ && su $APP_USER -c 'git clone https://github.com/CNCFlora/Services.git www'
 RUN cd /home/$APP_USER/www && bundle install
-
-EXPOSE 22
-#EXPOSE 80
-EXPOSE 8080
 
 ADD config.yml /root/config.yml
 RUN cp /root/config.yml /home/$APP_USER/www && chown $APP_USER /home/$APP_USER/www/config.yml && rm /root/config.yml
