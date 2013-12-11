@@ -1,9 +1,12 @@
 development:
     base_url: "http://localhost:9494"
     couchdb: "http://localhost:5984/cncflora"
+    esearch: "http://localhost:9200/cncflora"
 test:
     base_url: "http://localhost:9292"
     couchdb: "http://localhost:5984/cncflora_test"
+    esearch: "http://localhost:9200/cncflora_test"
 production:
     base_url: "http://cncflora.jbrj.gov.br/services"
     couchdb: "http://cncflora.jbrj.gov.br:5984/cncflora"
+    esearch: "http://cncflora.jbrj.gov.br:9200/cncflora"
