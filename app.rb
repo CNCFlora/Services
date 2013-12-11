@@ -45,8 +45,7 @@ end
 api[:apis].each { |resource| 
     resource[:apis].each { |api|
         get api[:path].gsub(/{(\w+)}/,':\1') do
-            #[400,'{"error"=>"Missing required parameter."}']
-            MultiJson.dump api[:operations][0][:execute].call params
+            MultiJson.dump(api[:operations][0][:execute].call(params), :pretty=>true)
         end
     }
 }

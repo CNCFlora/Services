@@ -39,7 +39,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
                                 }
                             ],
                             :execute=>Proc.new{|params|
-                                r = RestClient.get "#{es}/_search?q=#{params.q}"
+                                r = RestClient.get "#{es}/_search?q=#{params['q'].to_uri}"
                                 MultiJson.load(r.to_str, :symbolize_keys => true)[:hits][:hits]
                             }
                         }

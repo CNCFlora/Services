@@ -51,5 +51,12 @@ describe "Web app" do
         expect(r).to eq(nil)
     end
 
+    it "Can search" do
+        get "/search/all?q=Aphelandra%20longiflora"
+        r = MultiJson.load(last_response.body, :symbolize_keys => true)
+        expect(r).to be_an_instance_of(Array)
+
+    end
+
 end
 
