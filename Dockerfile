@@ -31,7 +31,7 @@ EXPOSE 22
 EXPOSE 8080
 
 ADD config.yml /root/config.yml
-RUN cp /root/config.yml /home/$APP_USER/www && chown $APP_USER /home/$APP_USER/www/config.yml
+RUN cp /root/config.yml /home/$APP_USER/www && chown $APP_USER /home/$APP_USER/www/config.yml && rm /root/config.yml
 ADD start.sh /root/start.sh
 RUN chmod +x /root/start.sh
 
