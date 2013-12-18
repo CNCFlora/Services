@@ -23,14 +23,14 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
     :apis=>[
         {
             :path=>"/search",
-            :description=>"Search",
+            :description=>"Generic search",
             :apis=>[
                 {
                     :path=>"/search/all",
                     :operations=>[
                         {
                             :method=>"GET",
-                            :summary=>"General search",
+                            :summary=>"General fulltext search accross whole database",
                             :nickname=>"search",
                             :parameters=>[
                                 {
@@ -39,10 +39,20 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
                                     :required=>true,
                                     :type=>"string",
                                     :paramType=>"query"
+                                },
+                                {
+                                    :name=>"type",
+                                    :description=>"query",
+                                    :required=>false,
+                                    :type=>"string",
+                                    :paramType=>"query",
+                                    :enum=>["assessment","profile","taxon","biblio"]
                                 }
                             ],
                             :execute=>Proc.new{|params|
-                                r = RestClient.get "#{es}/_search?q=#{params['q'].to_uri}"
+                                type = "#{params['type']}/" || '/';
+                                url = "#{es}/#{type}_search?q=#{params['q'].to_uri}"
+                                r = RestClient.get url
                                 MultiJson.load(r.to_str, :symbolize_keys => true)[:hits][:hits]
                             }
                         }

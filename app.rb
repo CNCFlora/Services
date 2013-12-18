@@ -38,8 +38,8 @@ get '/api-docs/:path' do
         :apis=>[]
         }
     api[:apis].each { |api| if api[:path] == "/#{params[:path]}" then re[:apis] = api[:apis]; end}
-    puts api[:models]
     MultiJson.dump re
+
 end
 
 api[:apis].each { |resource| 
