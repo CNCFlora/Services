@@ -36,16 +36,23 @@ get '/api-docs/:path' do
         :produces=>["application/json"],
         :models=>api[:models],
         :apis=>[]
-
-    }
+        }
     api[:apis].each { |api| if api[:path] == "/#{params[:path]}" then re[:apis] = api[:apis]; end}
+    puts api[:models]
     MultiJson.dump re
 end
 
 api[:apis].each { |resource| 
     resource[:apis].each { |api|
         get api[:path].gsub(/{(\w+)}/,':\1') do
-            MultiJson.dump(api[:operations][0][:execute].call(params), :pretty=>true)
+            r = {}
+            begin
+                data = api[:operations][0][:execute].call(params)
+                r = {:success=>true,:result=>data}
+            rescue Exception => e
+                r = {:success=>false,:result=>nil,:error=>e.message} 
+            end
+            MultiJson.dump(r, :pretty=>true)
         end
     }
 }

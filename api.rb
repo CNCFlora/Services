@@ -7,9 +7,12 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
     :swaggerVersion=>"1.2",
     :info=>{
         :title=>"CNCFlora WebServices",
-        :description=>"CNCFlora conservation related public services. 
+        :description=>"CNCFlora conservation and biodiversity public web services. 
+                        <br /><br/>
+                        The following services provide the data generated and curated by the CNCFlora team and collaborators
+                        on the consolidation of species data and risk assessment.
                         <br /><br />
-                        <a href=\"http://cncflora.jbrj.gov.br\">CNCFlora Portal</a>",
+                        See also the <a href=\"http://cncflora.jbrj.gov.br\">CNCFlora Portal</a>.",
         :contact=>"dev@cncflora.jbrj.gov.br",
         :license=>"CC-BY-NC",
         :licenseUrl=>"http://creativecommons.org/licenses/by-nc/4.0/"
