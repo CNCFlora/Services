@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPTS="RACK_ENV=production"
+OPTS="RACK_ENV=production ENV=production"
 [[ $BASE_URL ]] && OPTS="$OPTS BASE_URL=$BASE_URL"
 [[ $COUCHDB ]] && OPTS="$OPTS COUCHDB=$COUCHDB"
 [[ $ESEARCH ]] && OPTS="$OPTS ESEARCH=$ESEARCH"
