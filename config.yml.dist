@@ -8,5 +8,5 @@ test:
     esearch: "http://localhost:9200/cncflora_test"
 production:
     base_url: "http://cncflora.jbrj.gov.br/services"
-    couchdb: "http://cncflora.jbrj.gov.br:5984/cncflora"
-    esearch: "http://cncflora.jbrj.gov.br:9200/cncflora"
+    couchdb: "http://cncflora.jbrj.gov.br/couchdb/cncflora"
+    esearch: "http://cncflora.jbrj.gov.br/es/cncflora"
