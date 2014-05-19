@@ -1,6 +1,8 @@
+require 'couchdb_basic'
+require 'json'
 
-db = CouchDB.new ENV['COUCHDB'] || Sinatra::Application.settings.couchdb
-es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
+db = Couchdb.new ENV['COUCHDB'] || Sinatra::Application.settings.couchdb
+es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
 
 @api = {
     :apiVersion=>"0.0.1",
@@ -13,12 +15,12 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
                         on the consolidation of species data and risk assessment.
                         <br /><br />
                         See also the <a href=\"http://cncflora.jbrj.gov.br\">CNCFlora Portal</a>.",
-        :contact=>"dev@cncflora.jbrj.gov.br",
+        :contact=>"diogo@cncflora.jbrj.gov.br",
         :license=>"CC-BY-NC",
         :licenseUrl=>"http://creativecommons.org/licenses/by-nc/4.0/"
     },
     :models=> {
-        "Assessment"=> MultiJson.load(db.get("_design/assessments")[:schema][:assessment][27..-4], :symbolize_keys=>true)
+        "Assessment"=> JSON.parse(IO.read('assessment.json'))
     },
     :apis=>[
         {
@@ -26,7 +28,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
             :description=>"Generic search",
             :apis=>[
                 {
-                    :path=>"/search/all",
+                    :path=>"/../search/all",
                     :operations=>[
                         {
                             :method=>"GET",
@@ -43,17 +45,14 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
                                 {
                                     :name=>"type",
                                     :description=>"query",
-                                    :required=>false,
+                                    :required=>true,
                                     :type=>"string",
                                     :paramType=>"query",
                                     :enum=>["assessment","profile","taxon","biblio"]
                                 }
                             ],
                             :execute=>Proc.new{|params|
-                                type = "#{params['type']}/" || '/';
-                                url = "#{es}/#{type}_search?q=#{params['q'].to_uri}"
-                                r = RestClient.get url
-                                MultiJson.load(r.to_str, :symbolize_keys => true)[:hits][:hits]
+                                search(params['type'],"#{params['q']} AND metadata.status='published'")
                             }
                         }
                     ]
@@ -65,7 +64,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
             :description=>"Retrieve assessments",
             :apis=>[
                 {
-                    :path=>"/assessments/family/{family}",
+                    :path=>"/../assessments/family/{family}",
                     :operations=>[
                          {
                              :method=>"GET",
@@ -82,15 +81,13 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                                db.view('assessments','by_family_and_status',
-                                            {:key=>[ params[:family].upcase,"published"]})
-                                  .map {|row| row[:value]}
+                                search('assessment',"taxon.family:'#{params["family"]}' AND metadata.status='published'")
                             }
                         }
                     ]
                 },
                 {
-                    :path=>"/assessments/taxon/{taxon}",
+                    :path=>"/../assessments/taxon/{taxon}",
                     :operations=>[
                          {
                              :method=>"GET",
@@ -107,10 +104,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.esearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                                db.view('assessments','by_taxon_name',
-                                         {:key=>params[:taxon]})
-                                  .map {|row| row[:value]}
-                                  .last
+                                search('assessment',"taxon.scientificName:'#{params["taxon"]}' AND metadata.status='published'")[0]
                             }
                         }
                     ]

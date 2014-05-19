@@ -1,50 +1,60 @@
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+
 require 'sinatra'
 require 'sinatra/config_file'
-require 'sinatra/mustache'
 require "sinatra/reloader" if development? || test?
-require 'multi_json'
-require 'time'
+
+require 'securerandom'
+require 'json'
+require 'uri'
+require 'net/http'
 
 if development? || test? 
     also_reload "api.rb"
-    also_reload "couchdb.rb"
 end
 
-config_file ENV['CONFIG'] || 'config.yml'
-
-require_relative 'couchdb'
+require_relative 'setup'
 require_relative 'api'
 
 api = @api
 
 get '/' do
-    mustache :index, {}, {:url=> (ENV['BASE_URL'] || settings.base_url)+"/api-docs"}
+    redirect "#{settings.path}/index.html"
 end
 
 get '/api-docs' do
     re = api.clone
     re[:apis] = api[:apis].map { |api| {:path=>api[:path],:description=>api[:description]}}
-    MultiJson.dump re
+    re.to_json
 end
 
 get '/api-docs/:path' do
+
     re = {
         :apiVersion=>api[:apiVersion],
         :swaggerVersion=>api[:swaggerVersion],
-        :basePath=>ENV['BASE_URL'] || settings.base_url,
         :resourcePath=>"/#{params[:path]}",
         :produces=>["application/json"],
         :models=>api[:models],
         :apis=>[]
         }
-    api[:apis].each { |api| if api[:path] == "/#{params[:path]}" then re[:apis] = api[:apis]; end}
-    MultiJson.dump re
 
+    api[:apis].each { |api| 
+        if api[:path] == "/#{params[:path]}" then 
+            re[:apis] = api[:apis]; 
+        end
+    }
+
+    re.to_json
 end
 
 api[:apis].each { |resource| 
     resource[:apis].each { |api|
-        get api[:path].gsub(/{(\w+)}/,':\1') do
+        path = api[:path].gsub(/{(\w+)}/,':\1').gsub("../","")
+        puts api[:path]
+        puts path
+        get path do
             r = {}
             begin
                 data = api[:operations][0][:execute].call(params)
@@ -52,7 +62,7 @@ api[:apis].each { |resource|
             rescue Exception => e
                 r = {:success=>false,:result=>nil,:error=>e.message} 
             end
-            MultiJson.dump(r, :pretty=>true)
+            r.to_json
         end
     }
 }

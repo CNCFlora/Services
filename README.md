@@ -2,11 +2,13 @@
 
 Public webservices and documentation, using [swagger](https://developers.helloreverb.com/swagger/).
 
+Access at [CNCFlora Services](http://cncflora.jbrj.gov.br/services).
+
 ## Deployment
 
 ### Docker/CI
 
-TODO
+    docker run -d -p 8080:8080 -t cncflora/services
 
 ### Manual
 
@@ -20,8 +22,8 @@ Start with git, obviously:
 
 Now clone the app, and enter it's directory:
 
-    $ git clone git@github.com:CNCFlora/Services.git 
-    $ cd Services
+    $ git clone git@github.com:CNCFlora/Services.git services
+    $ cd services
 
 ### Vagrant
 
@@ -37,5 +39,10 @@ To run tests:
 
     $ vagrant ssh -c "cd /vagrant && rspec app_test.rb"
 
-The app will be running on 9494 and couchdb on 5999. 
+The app will be running on 9292.
+
+
+## License
+
+Apache License 2.0
 

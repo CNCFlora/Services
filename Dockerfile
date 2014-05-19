@@ -1,38 +1,17 @@
-# CNCFlora Services 
+FROM cncflora/ruby
 
-FROM stackbrew/ubuntu:raring
-MAINTAINER Diogo "kid" <diogo@diogok.net>
+RUN mkdir /root/services
+ADD . /root/services
+RUN cd /root/services && \
+    gem install bundler && \
+    bundle install
 
-ENV APP_USER cncflora 
-ENV APP_PASS cncflora
-
-RUN useradd -g users -s /bin/bash -m $APP_USER
-RUN echo $APP_USER:$APP_PASS | chpasswd
-
-RUN cp /etc/apt/sources.list /etc/apt/sources.list.bkp && sed -e 's/http/ftp/g' /etc/apt/sources.list.bkp > /etc/apt/sources.list
-RUN apt-get update -y
-RUN apt-get install ruby1.9.3 curl git vim openssh-server tmux -y
-
-RUN mkdir /var/run/sshd 
-
-#RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7 && gpg --armor --export 561F9B9CAC40B2F7 | sudo apt-key add -
-#RUN apt-get install apt-transport-https -y
-#RUN echo "deb https://oss-binaries.phusionpassenger.com/apt/passenger raring main" >> /etc/apt/sources.list
-#RUN apt-get update -y && apt-get install nginx-full passenger -y
-
-RUN gem sources -r http://rubygems.org/ && gem sources -r http://rubygems.org && gem sources -a https://rubygems.org
-RUN gem install bundler
-
-EXPOSE 22
-EXPOSE 9292
-
-RUN cd /home/$APP_USER/ && su $APP_USER -c 'git clone https://github.com/CNCFlora/Services.git www'
-RUN cd /home/$APP_USER/www && bundle install
-
-ADD config.yml /root/config.yml
-RUN cp /root/config.yml /home/$APP_USER/www && chown $APP_USER /home/$APP_USER/www/config.yml && rm /root/config.yml
+ENV ENV production
+ENV RACK_ENV production
 ADD start.sh /root/start.sh
 RUN chmod +x /root/start.sh
+
+EXPOSE 8080
 
 CMD ["/root/start.sh"]
 
