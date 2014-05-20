@@ -33,33 +33,33 @@ describe "Web app" do
 
     it "Can list assessments of family" do
         get "/assessments/family/ACANTHACEAE"
-        r = JSON.parse(last_response.body)['result']
+        r = JSON.parse(last_response.body)
         expect(r.map {|doc| doc['taxon']['family']}.uniq).to eq(["ACANTHACEAE"])
         expect(r.count).to eq(2)
 
         get "/assessments/family/BROMELIACEAE"
-        r = JSON.parse(last_response.body)['result']
+        r = JSON.parse(last_response.body)
         expect(r.map {|doc| doc['taxon']['family']}.uniq).to eq(["BROMELIACEAE"])
         expect(r.count).to eq(1)
     end
 
     it "Can get assessment of taxon" do
         get "/assessments/taxon/Aphelandra%20espirito-santensis"
-        r = JSON.parse(last_response.body)['result']
+        r = JSON.parse(last_response.body)
         expect(r['assessment']=='CR')
 
         get "/assessments/taxon/Aphelandra+espirito-santensis"
-        r = JSON.parse(last_response.body)['result']
+        r = JSON.parse(last_response.body)
         expect(r['assessment']=='CR')
 
         get "/assessments/taxon/NO"
-        r = JSON.parse(last_response.body)['result']
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
         expect(r).to eq(nil)
     end
 
     it "Can search" do
         get "/search/all?q=Aphelandra%20longiflora"
-        r = JSON.parse(last_response.body)['result']
+        r = JSON.parse(last_response.body)
         expect(r).to be_an_instance_of(Array)
         expect(r[0]['assessment']).to eq("VU")
     end

@@ -52,15 +52,12 @@ end
 api[:apis].each { |resource| 
     resource[:apis].each { |api|
         path = api[:path].gsub(/{(\w+)}/,':\1').gsub("../","")
-        puts api[:path]
-        puts path
         get path do
             r = {}
             begin
-                data = api[:operations][0][:execute].call(params)
-                r = {:success=>true,:result=>data}
+                r = api[:operations][0][:execute].call(params)
             rescue Exception => e
-                r = {:success=>false,:result=>nil,:error=>e.message} 
+                r = nil
             end
             r.to_json
         end

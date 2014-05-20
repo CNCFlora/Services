@@ -19,7 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.cpus = 1
   end
 
-  config.vm.network "private_network", ip: "192.168.50.20"
+  config.vm.network "private_network", ip: "192.168.50.15"
   config.vm.network :forwarded_port, host: 9292, guest: 9292, auto_correct: true
   config.vm.network :forwarded_port, host: 8080, guest: 8080, auto_correct: true
 
