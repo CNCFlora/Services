@@ -45,14 +45,22 @@ describe "Web app" do
 
     it "Can get assessment of taxon" do
         get "/assessments/taxon/Aphelandra%20espirito-santensis"
-        r = JSON.parse(last_response.body)
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
         expect(r['assessment']=='CR')
 
         get "/assessments/taxon/Aphelandra+espirito-santensis"
-        r = JSON.parse(last_response.body)
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
         expect(r['assessment']=='CR')
 
+        get "/assessments/taxon/Aphelandra%20longiflora"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r['assessment']=='VU')
+
         get "/assessments/taxon/NO"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r).to eq(nil)
+
+        get "/assessments/taxon/Another%20longiflora"
         r = JSON.parse(last_response.body,{:quirks_mode=>true})
         expect(r).to eq(nil)
     end

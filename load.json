@@ -1,6 +1,7 @@
 {
     "docs": [
         {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"ACANTHACEAE","scientificName":"Aphelandra longiflora"},"assessment":"VU"},
+        {"metadata":{"type":"assessment","status":"review"},"taxon":{"family":"ACANTHACEAE","scientificName":"Aphelandra longiflora"},"assessment":"EN"},
         {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"ACANTHACEAE","scientificName":"Aphelandra espirito-santensis"},"assessment":"CR"},
         {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"BROMELIACEAE","scientificName":"Tillandsia cyanea"},"assessment":"LC"},
         {"metadata":{"type":"assessment","status":"open"},"taxon":{"family":"BROMELIACEAE","scientificName":"Tillandsia cyanea"},"assessment":"LC"},
