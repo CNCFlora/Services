@@ -82,6 +82,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                             ],
                             :execute=> Proc.new{ |params|
                                 search('assessment',"taxon.family:\"#{params["family"]}\" AND metadata.status='published'")
+                                     .select {|doc| doc['taxon']['family'] == params['family'] }
                             }
                         }
                     ]
@@ -104,7 +105,8 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                                search('assessment',"taxon.scientificName:\"#{params["taxon"]}\" AND metadata.status='published'")[0]
+                               search('assessment',"taxon.scientificName:\"#{params["taxon"]}\" AND metadata.status='published'")
+                                     .select {|doc| doc['taxon']['scientificName'] == params['taxon'].gsub("+"," ") }[0]
                             }
                         }
                     ]

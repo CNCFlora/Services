@@ -63,6 +63,10 @@ describe "Web app" do
         get "/assessments/taxon/Another%20longiflora"
         r = JSON.parse(last_response.body,{:quirks_mode=>true})
         expect(r).to eq(nil)
+
+        get "/assessments/taxon/Aphelandra"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r).to eq(nil)
     end
 
     it "Can search" do
