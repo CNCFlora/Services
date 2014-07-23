@@ -5,22 +5,16 @@ require 'sinatra'
 require 'sinatra/config_file'
 require "sinatra/reloader" if development? || test?
 
-require 'securerandom'
-require 'json'
-require 'uri'
-require 'net/http'
+require 'cncflora_commons'
 
-if development? || test? 
-    also_reload "api.rb"
-end
+setup 'config.yml'
 
-require_relative 'setup'
 require_relative 'api'
 
 api = @api
 
 get '/' do
-    redirect "#{settings.path}/index.html"
+    redirect "#{settings.base}/index.html"
 end
 
 get '/api-docs' do
@@ -57,6 +51,8 @@ api[:apis].each { |resource|
             begin
                 r = api[:operations][0][:execute].call(params)
             rescue Exception => e
+                puts e
+                puts e.backtrace
                 r = nil
             end
             r.to_json

@@ -1,12 +1,12 @@
 development:
     etcd: "http://localhost:4001"
     base: 'cncflora'
-    base_url: "http://192.168.50.15:9292"
+    path: ''
 test:
     etcd: "http://localhost:4001"
     base: 'cncflora_test'
-    base_url: "http://192.168.50.15:9292"
+    path: ''
 production:
-    etcd: "http://localhost:4001"
-    base: 'cncflora'
-    base_url: "http://cncflora.jbrj.gov.br/services"
+    etcd: "http://cncflora.jbrj.gov.br/etcd"
+    base: 'livro_vermelho'
+    path: '/services'
