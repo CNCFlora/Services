@@ -2,7 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     backports (3.6.0)
-    cncflora_commons (0.0.11)
+    cncflora_commons (0.0.15)
     couchdb_basic (0.0.3)
       multi_json
       rest_client
