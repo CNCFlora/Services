@@ -1,7 +1,7 @@
 FROM cncflora/ruby
 
 RUN apt-get install supervisor -y
-RUN gem install small-ops
+RUN gem install small-ops -v 0.0.30
 RUN mkdir /var/log/supervisord 
 
 RUN gem install bundler
@@ -17,6 +17,7 @@ ENV ENV production
 ENV RACK_ENV production
 
 EXPOSE 8080
+EXPOSE 9001
 
 CMD ["supervisord"]
 
