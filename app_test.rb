@@ -31,6 +31,12 @@ describe "Web app" do
         }
     end
 
+    it "Can list families" do
+        get "/assessments/families"
+        r = JSON.parse(last_response.body)
+        expect(r).to eq(['ACANTHACEAE','BROMELIACEAE'])
+    end
+
     it "Can list assessments of family" do
         get "/assessments/family/ACANTHACEAE"
         r = JSON.parse(last_response.body)

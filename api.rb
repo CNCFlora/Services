@@ -64,6 +64,25 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
             :description=>"Retrieve assessments",
             :apis=>[
                 {
+                    :path=>"/../assessments/families",
+                    :operations=>[
+                         {
+                             :method=>"GET",
+                             :type=>"Assessment",
+                             :summary=>"Return families that have published assessments",
+                             :nickname=>"families",
+                             :parameters=>[
+                            ],
+                            :execute=> Proc.new{ |params|
+                                families = []
+                                search('assessment',"taxon.family:\"#{params["family"]}\" AND metadata.status:\"published\"")
+                                     .each {|doc| families << doc["taxon"]["family"].upcase}
+                                 families.uniq
+                            }
+                        }
+                    ]
+                },
+                {
                     :path=>"/../assessments/family/{family}",
                     :operations=>[
                          {
