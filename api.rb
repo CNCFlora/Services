@@ -75,7 +75,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                             ],
                             :execute=> Proc.new{ |params|
                                 families = []
-                                search('assessment',"taxon.family:\"#{params["family"]}\" AND metadata.status:\"published\"")
+                                search('assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
                                      .each {|doc| families << doc["taxon"]["family"].upcase}
                                  families.uniq
                             }
@@ -100,7 +100,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                                search('assessment',"taxon.family:\"#{params["family"]}\" AND metadata.status:\"published\"")
+                                search('assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
                                      .select {|doc| doc['taxon']['family'] == params['family'] }
                             }
                         }
@@ -124,8 +124,8 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                               search('assessment',"taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" AND metadata.status:\"published\"")
-                                     .select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") }[0]
+                               r=search('assessment',"( taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" OR taxon.scientificName:\"#{params["taxon"]}\" ) AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
+                               r.select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") || doc['taxon']['scientificName']==params["taxon"].gsub("+"," ") }[0]
                             }
                         }
                     ]
@@ -154,8 +154,8 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                               search('profile',"taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" AND metadata.status:\"done\"")
-                                     .select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") }[0]
+                               r=search('profile',"( taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" OR taxon.scientificName:\"#{params["taxon"]}\" ) AND metadata.status:\"done\"")
+                               r.select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") || doc['taxon']['scientificName'] == params['taxon'].gsub('+',' ') }[0]
                             }
                         }
                     ]
