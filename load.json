@@ -1,10 +1,16 @@
 {
     "docs": [
-        {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"ACANTHACEAE","scientificName":"Aphelandra longiflora"},"assessment":"VU"},
-        {"metadata":{"type":"assessment","status":"review"},"taxon":{"family":"ACANTHACEAE","scientificName":"Aphelandra longiflora"},"assessment":"EN"},
-        {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"ACANTHACEAE","scientificName":"Aphelandra espirito-santensis"},"assessment":"CR"},
-        {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"BROMELIACEAE","scientificName":"Tillandsia cyanea"},"assessment":"LC"},
-        {"metadata":{"type":"assessment","status":"open"},"taxon":{"family":"BROMELIACEAE","scientificName":"Tillandsia cyanea"},"assessment":"LC"},
-        {"metadata":{"type":"image","status":"published"},"taxon":{"family":"BROMELIACEAE","scientificName":"Tillandsia cyanea"},"assessment":"LC"}
+        {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"ACANTHACEAE","scientificNameWithoutAuthorship":"Aphelandra longiflora"},"assessment":"VU"},
+        {"metadata":{"type":"assessment","status":"review"},"taxon":{"family":"ACANTHACEAE","scientificNameWithoutAuthorship":"Aphelandra longiflora"},"assessment":"EN"},
+        {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"ACANTHACEAE","scientificNameWithoutAuthorship":"Aphelandra espirito-santensis"},"assessment":"CR"},
+        {"metadata":{"type":"assessment","status":"published"},"taxon":{"family":"BROMELIACEAE","scientificNameWithoutAuthorship":"Tillandsia cyanea"},"assessment":"LC"},
+        {"metadata":{"type":"assessment","status":"open"},"taxon":{"family":"BROMELIACEAE","scientificNameWithoutAuthorship":"Tillandsia cyanea"},"assessment":"LC"},
+        {"metadata":{"type":"image","status":"published"},"taxon":{"family":"BROMELIACEAE","scientificNameWithoutAuthorship":"Tillandsia cyanea"},"assessment":"LC"},
+        {"metadata":{"type":"profile","status":"done"},"taxon":{"family":"ACANTHACEAE","scientificNameWithoutAuthorship":"Aphelandra longiflora"},"profile":"VU"},
+        {"metadata":{"type":"profile","status":"review"},"taxon":{"family":"ACANTHACEAE","scientificNameWithoutAuthorship":"Aphelandra longiflora"},"profile":"EN"},
+        {"metadata":{"type":"profile","status":"done"},"taxon":{"family":"ACANTHACEAE","scientificNameWithoutAuthorship":"Aphelandra espirito-santensis"},"profile":"CR"},
+        {"metadata":{"type":"profile","status":"done"},"taxon":{"family":"BROMELIACEAE","scientificNameWithoutAuthorship":"Tillandsia cyanea"},"profile":"LC"},
+        {"metadata":{"type":"profile","status":"open"},"taxon":{"family":"BROMELIACEAE","scientificNameWithoutAuthorship":"Tillandsia cyanea"},"profile":"LC"},
+        {"metadata":{"type":"image","status":"done"},"taxon":{"family":"BROMELIACEAE","scientificNameWithoutAuthorship":"Tillandsia cyanea"},"profile":"LC"}
     ]
 }

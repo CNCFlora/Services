@@ -124,13 +124,43 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                               search('assessment',"taxon.scientificName:\"#{params["taxon"]}\" AND metadata.status:\"published\"")
-                                     .select {|doc| doc['taxon']['scientificName'] == params['taxon'].gsub("+"," ") }[0]
+                               search('assessment',"taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" AND metadata.status:\"published\"")
+                                     .select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") }[0]
                             }
                         }
                     ]
                 }
             ]   
+        },
+        {
+            :path=>'/profiles',
+            :description=>"Retrieve profiles",
+            :apis=>[
+                {
+                    :path=>"/../profiles/taxon/{taxon}",
+                    :operations=>[
+                         {
+                             :method=>"GET",
+                             :summary=>"Return published profile for taxon",
+                             :nickname=>"profileForTaxon",
+                             :type=>"profile",
+                             :parameters=>[
+                                 {
+                                    :name=>"taxon",
+                                    :description=>"Specie scientific name, without author. Eg.: Aphelandra longiflora",
+                                    :required=>true,
+                                    :type=>"string",
+                                    :paramType=>"path"
+                                }
+                            ],
+                            :execute=> Proc.new{ |params|
+                               search('profile',"taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" AND metadata.status:\"done\"")
+                                     .select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") }[0]
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

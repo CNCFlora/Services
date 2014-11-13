@@ -75,6 +75,32 @@ describe "Web app" do
         expect(r).to eq(nil)
     end
 
+    it "Can get profile of taxon" do
+        get "/profiles/taxon/Aphelandra%20espirito-santensis"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r['profile']=='CR')
+
+        get "/profiles/taxon/Aphelandra+espirito-santensis"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r['profile']=='CR')
+
+        get "/profiles/taxon/Aphelandra%20longiflora"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r['profile']=='VU')
+
+        get "/profiles/taxon/NO"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r).to eq(nil)
+
+        get "/profiles/taxon/Another%20longiflora"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r).to eq(nil)
+
+        get "/profiles/taxon/Aphelandra"
+        r = JSON.parse(last_response.body,{:quirks_mode=>true})
+        expect(r).to eq(nil)
+    end
+
     it "Can search" do
         get "/search/all?q=Aphelandra%20longiflora"
         r = JSON.parse(last_response.body)
