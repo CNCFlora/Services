@@ -20,7 +20,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
         :licenseUrl=>"http://creativecommons.org/licenses/by-nc/4.0/"
     },
     :models=> {
-        "Assessment"=> JSON.parse(IO.read('assessment.json'))
+        "Assessment"=> JSON.parse(IO.read('src/assessment.json'))
     },
     :apis=>[
         {
@@ -52,7 +52,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=>Proc.new{|params|
-                                search(params['type'],"#{params['q']} AND metadata.status:\"published\"")
+                                search(settings.db,params['type'],"#{params['q']} AND metadata.status:\"published\"")
                             }
                         }
                     ]
@@ -75,7 +75,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                             ],
                             :execute=> Proc.new{ |params|
                                 families = []
-                                search('assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
+                                search(settings.db,'assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
                                      .each {|doc| families << doc["taxon"]["family"].upcase}
                                  families.uniq
                             }
@@ -100,7 +100,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                                search('assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
+                                search(settings.db,'assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
                                      .select {|doc| doc['taxon']['family'] == params['family'] }
                             }
                         }
@@ -124,7 +124,7 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                               r=search('assessment',"( taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" OR taxon.scientificName:\"#{params["taxon"]}\" ) AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
+                               r=search(settings.db,'assessment',"( taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" OR taxon.scientificName:\"#{params["taxon"]}\" ) AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
                                r.select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") || doc['taxon']['scientificName']==params["taxon"].gsub("+"," ") }[0]
                             }
                         }
@@ -154,7 +154,8 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                               r=search('profile',"( taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" OR taxon.scientificName:\"#{params["taxon"]}\" ) AND metadata.status:\"done\"")
+                               r=search(settings.db,'profile',"( taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" OR taxon.scientificName:\"#{params["taxon"]}\" ) AND metadata.status:\"done\"")
+                               puts "r=#{ r }"
                                r.select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") || doc['taxon']['scientificName'] == params['taxon'].gsub('+',' ') }[0]
                             }
                         }

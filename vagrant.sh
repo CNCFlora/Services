@@ -17,21 +17,25 @@ if [[ ! -e /root/.app_done ]]; then
 
     # uh?
     gem install bundler
-    #cd /vagrant && bundle install
 
     # initial config of app
     su vagrant -lc 'cd /vagrant && gem install bundler'
     su vagrant -lc 'cd /vagrant && bundle install'
-    su vagrant -lc 'cd /vagrant && [[ ! -e config.yml ]] && cp config.yml.dist config.yml'
     touch /root/.app_done
 fi
 
 # docker register to etcd
-gem install small-ops
-/usr/bin/docker2etcd
+if [[ ! -e /root/.ops_done ]]; then
+    gem install small-ops
+    touch /root/.ops_done
+fi
+docker2etcd -h 192.168.50.15 -e http://192.168.50.15:4001
 
 # setup couchdb
-HUB=$(docker ps | grep datahub | awk '{ print $10 }' | grep -e '[0-9]\{5\}' -o)
-curl -X PUT http://localhost:$HUB/cncflora
-curl -X PUT http://localhost:$HUB/cncflora_test
+if [[ ! -e /root/.db_done ]]; then
+    HUB=5984
+    curl -X PUT http://localhost:$HUB/cncflora
+    curl -X PUT http://localhost:$HUB/cncflora_test
+    touch /root/.db_done
+fi
 

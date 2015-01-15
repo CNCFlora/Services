@@ -17,8 +17,8 @@ end
 describe "Web app" do
 
     before(:all) do
-        @couch = Couchdb.new Sinatra::Application.settings.couchdb
-        @couch._post(JSON.parse(IO.read("load.json")),"/_bulk_docs")
+        @couch = Couchdb.new "#{ Sinatra::Application.settings.couchdb }/cncflora_test"
+        @couch._post(JSON.parse(IO.read("src/load.json")),"/_bulk_docs")
         sleep(3)
     end
 

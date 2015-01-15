@@ -1,0 +1,18 @@
+development:
+    etcd: "http://localhost:4001"
+    db: 'cncflora'
+    context: 'services'
+    lang: 'pt'
+    base: ''
+test:
+    etcd: "http://localhost:4001"
+    db: 'cncflora_test'
+    lang: 'pt'
+    context: 'services'
+    base: ''
+production:
+    etcd: "http://$HOST/etcd"
+    db: 'public'
+    lang: 'pt'
+    context: 'services'
+    base: '/services'
