@@ -5,7 +5,7 @@ if [[ ! -e /root/.apt_done ]]; then
     add-apt-repository ppa:brightbox/ruby-ng -y
     apt-get update
     apt-get upgrade -y
-    apt-get install wget curl git ruby2.1 ruby2.1-dev -y
+    apt-get install wget curl git ruby2.1 ruby2.1-dev zlibg1-dev -y
     touch /root/.apt_done
 fi
 
@@ -23,13 +23,6 @@ if [[ ! -e /root/.app_done ]]; then
     su vagrant -lc 'cd /vagrant && bundle install'
     touch /root/.app_done
 fi
-
-# docker register to etcd
-if [[ ! -e /root/.ops_done ]]; then
-    gem install small-ops
-    touch /root/.ops_done
-fi
-docker2etcd -h 192.168.50.15 -e http://192.168.50.15:4001
 
 # setup couchdb
 if [[ ! -e /root/.db_done ]]; then

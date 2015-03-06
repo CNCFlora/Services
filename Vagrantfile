@@ -15,7 +15,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "private_network", ip: "192.168.50.15"
 
   config.vm.provision "docker" do |d|
-    d.run "cncflora/etcd", name: "etcd", args: "-p 4001:4001"
     d.run "cncflora/elasticsearch", name: "elasticsearch", args: "-p 9200:9200"
     d.run "cncflora/couchdb", name: "couchdb", args: "-p 5984:5984 --link elasticsearch:elasticsearch -v /var/couchdb:/var/lib/couchdb:rw"
   end

@@ -8,7 +8,7 @@ gem 'sinatra-contrib'
 gem 'sinatra-config-file'
 
 gem 'couchdb_basic'
-gem 'cncflora_commons', '0.0.36'
+gem 'cncflora_commons', '0.0.39'
 
 gem 'rspec'
 gem 'rack-test'

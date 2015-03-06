@@ -1,18 +1,18 @@
 development:
-    etcd: "http://localhost:4001"
-    db: 'cncflora'
-    context: 'services'
-    lang: 'pt'
-    base: ''
+    lang: "pt"
+    base: ""
+    db: "cncflora"
+    couchdb: "http://192.168.50.15:5984"
+    elasticsearch: "http://192.168.50.15:9200"
 test:
-    etcd: "http://localhost:4001"
-    db: 'cncflora_test'
-    lang: 'pt'
-    context: 'services'
-    base: ''
+    lang: "pt"
+    base: ""
+    db: "cncflora_test"
+    couchdb: "http://192.168.50.15:5984"
+    elasticsearch: "http://192.168.50.15:9200"
 production:
-    etcd: "http://$HOST/etcd"
-    db: 'public'
-    lang: 'pt'
-    context: 'services'
-    base: '/services'
+    lang: "pt"
+    base: "/services"
+    db: "public"
+    couchdb: "http://$HOST/couchdb"
+    elasticsearch: "http://$HOST/elasticsearch"
