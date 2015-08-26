@@ -2,12 +2,11 @@ FROM cncflora/ruby
 
 RUN gem install bundler
 
-RUN mkdir /root/services
-ADD Gemfile /root/services/Gemfile
-RUN cd /root/services && bundle install
+ADD Gemfile /opt/app/Gemfile
+RUN bundle install
 
 EXPOSE 80
-WORKDIR /root/checklist
 CMD ["unicorn","-p","80"]
 
-ADD . /root/checklist
+ADD . /opt/app
+

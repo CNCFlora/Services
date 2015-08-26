@@ -1,8 +1,8 @@
 require 'couchdb_basic'
 require 'json'
 
-db = Couchdb.new ENV['COUCHDB'] || Sinatra::Application.settings.couchdb
-es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
+db = Couchdb.new Sinatra::Application.settings.couchdb
+es = Sinatra::Application.settings.elasticsearch
 
 @api = {
     :apiVersion=>"0.0.1",
@@ -18,9 +18,6 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
         :contact=>"diogo@cncflora.jbrj.gov.br",
         :license=>"CC-BY-NC",
         :licenseUrl=>"http://creativecommons.org/licenses/by-nc/4.0/"
-    },
-    :models=> {
-        "Assessment"=> JSON.parse(IO.read('src/assessment.json'))
     },
     :apis=>[
         {
@@ -100,8 +97,23 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
+                                family = http_get("#{settings.floradata}/api/v1/species?family=#{params["family"]}")["result"]
                                 search(settings.db,'assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
-                                     .select {|doc| doc['taxon']['family'] == params['family'] }
+                                     .select {|doc| doc['taxon']['family'].upcase == params['family'].upcase }
+                                     .map {|doc|
+                                       family.each {|taxon|
+                                         if doc["taxon"]["scientificNameWithoutAuthorship"]==taxon["scientificNameWithoutAuthorship"]
+                                           doc["taxon"]["current"]=taxon
+                                         else
+                                           taxon["synonyms"].each{|syn|
+                                           if doc["taxon"]["scientificNameWithoutAuthorship"]==syn["scientificNameWithoutAuthorship"]
+                                             doc["taxon"]["current"]=taxon
+                                           end
+                                           }
+                                         end
+                                       }
+                                       doc
+                                     }
                             }
                         }
                     ]
@@ -124,8 +136,24 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                               r=search(settings.db,'assessment',"( taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" OR taxon.scientificName:\"#{params["taxon"]}\" ) AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
-                               r.select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") || doc['taxon']['scientificName']==params["taxon"].gsub("+"," ") }[0]
+                               taxonomy = taxonomy(params["taxon"].gsub("+"," "))
+
+                               names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
+                               if !taxonomy.nil?
+                                 names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{taxonomy["scientificNameWithoutAuthorship"]}\""
+                                 taxonomy["synonyms"].each {|syn|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
+                                 }
+                               end
+
+                               query = "(metadata.status:\"published\" OR metadata.status:\"comments\") AND (#{names_query})"
+
+                               r=search(settings.db,'assessment',query)[0]
+                               if !r.nil?
+                                 r["taxon"]["current"]=taxonomy
+                               end
+                               r
+
                             }
                         }
                     ]
@@ -154,8 +182,23 @@ es = ENV['ESEARCH'] || Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                               r=search(settings.db,'profile',"( taxon.scientificNameWithoutAuthorship:\"#{params["taxon"]}\" OR taxon.scientificName:\"#{params["taxon"]}\" ) AND metadata.status:\"done\"")
-                               r.select {|doc| doc['taxon']['scientificNameWithoutAuthorship'] == params['taxon'].gsub("+"," ") || doc['taxon']['scientificName'] == params['taxon'].gsub('+',' ') }[0]
+                               taxonomy = taxonomy(params["taxon"].gsub("+"," "))
+
+                               names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
+                               if !taxonomy.nil?
+                                 names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{taxonomy["scientificNameWithoutAuthorship"]}\""
+                                 taxonomy["synonyms"].each {|syn|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
+                                 }
+                               end
+
+                               query = "metadata.status:\"done\" AND ( #{names_query} )"
+
+                               r=search(settings.db,'profile',query)[0]
+                               if !r.nil?
+                                 r["taxon"]["current"]=taxonomy
+                               end
+                               r
                             }
                         }
                     ]

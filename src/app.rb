@@ -3,9 +3,9 @@ Encoding.default_internal = Encoding::UTF_8
 
 require 'sinatra'
 require 'sinatra/config_file'
-require "sinatra/reloader" if development? || test?
+require "sinatra/reloader" if development?
 
-require 'cncflora_commons'
+require_relative 'commons'
 
 setup 'config.yml'
 
@@ -30,7 +30,6 @@ get '/api-docs/:path' do
         :swaggerVersion=>api[:swaggerVersion],
         :resourcePath=>"/#{params[:path]}",
         :produces=>["application/json"],
-        :models=>api[:models],
         :apis=>[]
         }
 
