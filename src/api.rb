@@ -97,23 +97,47 @@ es = Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
-                                family = http_get("#{settings.floradata}/api/v1/species?family=#{params["family"]}")["result"]
+                                all_names= http_get_json("#{settings.aka}/nouns")
+
+                                names = {}
+                                all_names.each {|name|
+                                  n1 = name['noun1']
+                                  n2 = name['noun2']
+                                  if !names.has_key?(n1)
+                                    names[n1]=[]
+                                  end
+                                  if !names.has_key?(n2)
+                                    names[n2]=[]
+                                  end
+                                  names[n1].push n2
+                                  names[n2].push n1
+                                }
+
+                                family   = http_get("#{settings.floradata}/api/v1/species?family=#{params["family"]}")["result"]
+
+                                family_names={}
+                                family.each {|taxon|
+                                  family_names[taxon['scientificNameWithoutAuthorship']]=taxon
+                                  taxon['synonyms'].each{|syn|
+                                    family_names[syn['scientificNameWithoutAuthorship']]=taxon
+                                  }
+                                }
                                 search(settings.db,'assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
                                      .select {|doc| doc['taxon']['family'].upcase == params['family'].upcase }
                                      .map {|doc|
-                                       family.each {|taxon|
-                                         if doc["taxon"]["scientificNameWithoutAuthorship"]==taxon["scientificNameWithoutAuthorship"]
-                                           doc["taxon"]["current"]=taxon
+                                         spp = doc['taxon']['scientificNameWithoutAuthorship']
+                                         if !names.has_key?(spp)
+                                           names[spp]=[spp]
                                          else
-                                           taxon["synonyms"].each{|syn|
-                                           if doc["taxon"]["scientificNameWithoutAuthorship"]==syn["scientificNameWithoutAuthorship"]
-                                             doc["taxon"]["current"]=taxon
-                                           end
-                                           }
+                                           names[spp].push(spp)
                                          end
+                                         names[spp].each {|name|
+                                           if family_names.has_key?(name)
+                                             doc['taxon']['current']=family_names[name]
+                                           end
+                                         }
+                                         doc
                                        }
-                                       doc
-                                     }
                             }
                         }
                     ]
@@ -136,6 +160,7 @@ es = Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
+                               names = aka(params['taxon'].gsub("+"," "))
                                taxonomy = taxonomy(params["taxon"].gsub("+"," "))
 
                                names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
@@ -145,6 +170,10 @@ es = Sinatra::Application.settings.elasticsearch
                                    names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
                                  }
                                end
+
+                               names.each {|name|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{name}\""
+                               }
 
                                query = "(metadata.status:\"published\" OR metadata.status:\"comments\") AND (#{names_query})"
 
@@ -182,6 +211,7 @@ es = Sinatra::Application.settings.elasticsearch
                                 }
                             ],
                             :execute=> Proc.new{ |params|
+                               names = aka(params['taxon'].gsub("+",""))
                                taxonomy = taxonomy(params["taxon"].gsub("+"," "))
 
                                names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
@@ -191,6 +221,10 @@ es = Sinatra::Application.settings.elasticsearch
                                    names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
                                  }
                                end
+
+                               names.each {|name|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{name}\""
+                               }
 
                                query = "metadata.status:\"done\" AND ( #{names_query} )"
 

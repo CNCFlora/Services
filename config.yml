@@ -5,6 +5,7 @@ development:
     couchdb: "http://couchdb:5984"
     elasticsearch: "http://elasticsearch:9200"
     floradata: "http://floradata"
+    aka: "http://aka:8080"
 test:
     lang: "pt"
     base: ""
@@ -12,6 +13,7 @@ test:
     couchdb: "http://couchdb:5984"
     elasticsearch: "http://elasticsearch:9200"
     floradata: "http://floradata"
+    aka: "http://aka:8080"
 production:
     lang: "pt"
     base: "/services"
@@ -19,3 +21,4 @@ production:
     couchdb: "http://couchdb:5984"
     elasticsearch: "http://elasticsearch:9200"
     floradata: "http://floradata"
+    aka: "http://aka:8080"

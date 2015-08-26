@@ -8,6 +8,15 @@ def http_get(uri)
     JSON.parse(Net::HTTP.get(URI(uri)))
 end
 
+def http_get_json(uri)
+    uri = URI.parse(uri)
+    http = Net::HTTP.new(uri.host, uri.port)
+    header = {'Accept'=> 'application/json'}
+    request = Net::HTTP::Get.new(uri.request_uri, header)
+    response = http.request(request)
+    JSON.parse(response.body)
+end
+
 def http_post(uri,doc)
     uri = URI.parse(uri)
     http = Net::HTTP.new(uri.host, uri.port)
@@ -136,7 +145,21 @@ def setup(file)
     @config
 end
 
+def aka(name)
+  names = [name]
+  http_get_json("#{settings.aka}/noun/#{URI.encode(name)}")
+  .each { |aka| names.push aka["noun2"] }
+  names
+end
+
 def taxonomy(name)
-  r=http_get("#{settings.floradata}/api/v1/specie?scientificName=#{CGI.escape(name)}")["result"]
+  names=aka(name)
+  r=nil
+  names.each {|name|
+    re=http_get("#{settings.floradata}/api/v1/specie?scientificName=#{CGI.escape(name)}")["result"]
+    if !re.nil? then
+      r=re
+    end
+  }
   r
 end
