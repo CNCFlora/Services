@@ -9,7 +9,7 @@ es = Sinatra::Application.settings.elasticsearch
     :swaggerVersion=>"1.2",
     :info=>{
         :title=>"CNCFlora WebServices",
-        :description=>"CNCFlora conservation and biodiversity public web services. 
+        :description=>"CNCFlora conservation and biodiversity public web services.
                         <br /><br/>
                         The following services provide the data generated and curated by the CNCFlora team and collaborators
                         on the consolidation of species data and risk assessment.
@@ -54,6 +54,48 @@ es = Sinatra::Application.settings.elasticsearch
                         }
                     ]
                 }
+            ]
+        },
+        {
+            :path=>"/occurrences",
+            :description=>"Retrieve occurrences",
+            :apis=>[
+              {
+                  :path=>"/../occurrences/scientificName/{scientificName}",
+                  :operations=>[
+                       {
+                           :method=>"GET",
+                           :summary=>"Return published occurrences for taxon",
+                           :nickname=>"occurrencesForTaxon",
+                           :type=>"Occurrences",
+                           :parameters=>[
+                               {
+                                  :name=>"scientificName",
+                                  :description=>"Specie scientific name, without author. Eg.: Aphelandra longiflora",
+                                  :required=>true,
+                                  :type=>"string",
+                                  :paramType=>"path"
+                              }
+                          ],
+                          :execute=> Proc.new{ |params|
+                             names = aka(params['scientificName'].gsub("+"," "))
+
+                             names.each {|name|
+                                 names = "acceptedNameUsage:\"#{name}\" OR scientificName:\"#{name}\""
+                             }
+
+                             query = "#{names}"
+
+                             r=search(settings.db,'occurrence',query)[0]
+                             if !r.nil?
+                               r["occurrence"]["current"]="empty"
+                             end
+                             r
+
+                          }
+                      }
+                  ]
+              }
             ]
         },
         {
@@ -187,7 +229,7 @@ es = Sinatra::Application.settings.elasticsearch
                         }
                     ]
                 }
-            ]   
+            ]
         },
         {
             :path=>'/profiles',
@@ -241,4 +283,3 @@ es = Sinatra::Application.settings.elasticsearch
         }
     ]
 }
-
