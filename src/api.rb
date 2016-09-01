@@ -45,11 +45,41 @@ es = Sinatra::Application.settings.elasticsearch
                                     :required=>true,
                                     :type=>"string",
                                     :paramType=>"query",
-                                    :enum=>["assessment","profile","taxon","biblio"]
+                                    :enum=>["assessment","occurrence","profile","taxon","biblio"]
                                 }
                             ],
                             :execute=>Proc.new{|params|
                                 search(settings.db,params['type'],"#{params['q']} AND metadata.status:\"published\"")
+                            }
+                        }
+                    ]
+                },
+                {
+                    :path=>"/../search/occurrences",
+                    :operations=>[
+                        {
+                            :method=>"GET",
+                            :summary=>"Occurrence fulltext search accross whole database",
+                            :nickname=>"search",
+                            :parameters=>[
+                                {
+                                    :name=>"q",
+                                    :description=>"query",
+                                    :required=>true,
+                                    :type=>"string",
+                                    :paramType=>"query"
+                                },
+                                {
+                                    :name=>"type",
+                                    :description=>"query",
+                                    :required=>true,
+                                    :type=>"string",
+                                    :paramType=>"query",
+                                    :enum=>["occurrence"]
+                                }
+                            ],
+                            :execute=>Proc.new{|params|
+                                search(settings.db,params['type'],"#{params['q']}")
                             }
                         }
                     ]
