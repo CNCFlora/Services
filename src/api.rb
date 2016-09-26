@@ -108,20 +108,8 @@ es = Sinatra::Application.settings.elasticsearch
                               }
                           ],
                           :execute=> Proc.new{ |params|
-                             names = aka(params['scientificName'].gsub("+"," "))
-
-                             names.each {|name|
-                                 names = "acceptedNameUsage:\"#{name}\" OR scientificName:\"#{name}\""
-                             }
-
-                             query = "#{names}"
-
-                             r=search(settings.db,'occurrence',query)[0]
-                             if !r.nil?
-                               r["occurrence"]["current"]="empty"
-                             end
-                             r
-
+                            r=search(settings.db,'occurrence',"scientificName:\"#{params["scientificName"]}\"")
+                            r
                           }
                       }
                   ]
