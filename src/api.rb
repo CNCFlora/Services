@@ -179,7 +179,9 @@ es = Sinatra::Application.settings.elasticsearch
                                 family.each {|taxon|
                                   family_names[taxon['scientificNameWithoutAuthorship']]=taxon
                                   taxon['synonyms'].each{|syn|
-                                    family_names[syn['scientificNameWithoutAuthorship']]=taxon
+                                    if !family_names.has_key?(syn['scientificNameWithoutAuthorship']) 
+                                      family_names[syn['scientificNameWithoutAuthorship']]=taxon
+                                    end
                                   }
                                 }
                                 search(settings.db,'assessment',"taxon.family:\"#{params["family"]}\" AND ( metadata.status:\"published\" OR metadata.status:\"comments\")")
