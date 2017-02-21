@@ -246,6 +246,50 @@ es = Sinatra::Application.settings.elasticsearch
                             }
                         }
                     ]
+                },
+                {
+                    :path=>"/../assessments/2taxon/{taxon}",
+                    :operations=>[
+                         {
+                             :method=>"GET",
+                             :summary=>"Return published assessment for taxon",
+                             :nickname=>"assessmentForTaxon",
+                             :type=>"Assessment",
+                             :parameters=>[
+                                 {
+                                    :name=>"taxon",
+                                    :description=>"Specie scientific name, without author. Eg.: Aphelandra longiflora",
+                                    :required=>true,
+                                    :type=>"string",
+                                    :paramType=>"path"
+                                }
+                            ],
+                            :execute=> Proc.new{ |params|
+                               names = aka(params['taxon'].gsub("+"," "))
+                               taxonomy = taxonomy(params["taxon"].gsub("+"," "))
+
+                               names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
+                               if !taxonomy.nil?
+                                 names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{taxonomy["scientificNameWithoutAuthorship"]}\""
+                                 taxonomy["synonyms"].each {|syn|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
+                                 }
+                               end
+                               names.each {|name|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{name}\""
+                               }
+
+                               query = "(metadata.status:\"published\" OR metadata.status:\"comments\") AND (#{names_query})"
+                               r=search(settings.db_test,'assessment',query)[0]
+
+                               if !r.nil?
+                                 r["taxon"]["current"]=taxonomy
+                               end
+                               r
+
+                            }
+                        }
+                    ]
                 }
             ]
         },

@@ -1,7 +1,8 @@
 development:
     lang: "pt"
     base: ""
-    db: "teste"
+    db: "public"
+    db_test: "endemicas_rio_de_janeiro"
     couchdb: "http://couchdb:5984"
     elasticsearch: "http://elasticsearch:9200"
     floradata: "http://floradata"
@@ -18,6 +19,7 @@ production:
     lang: "pt"
     base: "/services"
     db: "public"
+    db_test: "endemicas_rio_de_janeiro"
     couchdb: "http://couchdb:5984"
     elasticsearch: "http://elasticsearch:9200"
     floradata: "http://floradata"
