@@ -179,7 +179,7 @@ es = Sinatra::Application.settings.elasticsearch
                                 family.each {|taxon|
                                   family_names[taxon['scientificNameWithoutAuthorship']]=taxon
                                   taxon['synonyms'].each{|syn|
-                                    if !family_names.has_key?(syn['scientificNameWithoutAuthorship']) 
+                                    if !family_names.has_key?(syn['scientificNameWithoutAuthorship'])
                                       family_names[syn['scientificNameWithoutAuthorship']]=taxon
                                     end
                                   }
@@ -335,6 +335,50 @@ es = Sinatra::Application.settings.elasticsearch
                                query = "metadata.status:\"done\" AND ( #{names_query} )"
 
                                r=search(settings.db,'profile',query)[0]
+                               if !r.nil?
+                                 r["taxon"]["current"]=taxonomy
+                               end
+                               r
+                            }
+                        }
+                    ]
+                },
+                {
+                    :path=>"/../profiles/2taxon/{taxon}",
+                    :operations=>[
+                         {
+                             :method=>"GET",
+                             :summary=>"Return published profile for taxon",
+                             :nickname=>"profileForTaxon",
+                             :type=>"profile",
+                             :parameters=>[
+                                 {
+                                    :name=>"taxon",
+                                    :description=>"Specie scientific name, without author. Eg.: Aphelandra longiflora",
+                                    :required=>true,
+                                    :type=>"string",
+                                    :paramType=>"path"
+                                }
+                            ],
+                            :execute=> Proc.new{ |params|
+                               names = aka(params['taxon'].gsub("+",""))
+                               taxonomy = taxonomy(params["taxon"].gsub("+"," "))
+
+                               names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
+                               if !taxonomy.nil?
+                                 names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{taxonomy["scientificNameWithoutAuthorship"]}\""
+                                 taxonomy["synonyms"].each {|syn|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
+                                 }
+                               end
+
+                               names.each {|name|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{name}\""
+                               }
+
+                               query = "metadata.status:\"done\" AND ( #{names_query} )"
+
+                               r=search(settings.db_test,'profile',query)[0]
                                if !r.nil?
                                  r["taxon"]["current"]=taxonomy
                                end
