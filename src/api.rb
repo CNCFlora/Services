@@ -113,6 +113,30 @@ es = Sinatra::Application.settings.elasticsearch
                           }
                       }
                   ]
+              },
+              {
+                  :path=>"/../occurrences/2scientificName/{scientificName}",
+                  :operations=>[
+                       {
+                           :method=>"GET",
+                           :summary=>"Return occurrences from endemicas_rio_de_janeiro for taxon",
+                           :nickname=>"occurrencesForTaxon",
+                           :type=>"Occurrences",
+                           :parameters=>[
+                               {
+                                  :name=>"scientificName",
+                                  :description=>"Specie scientific name, without author. Eg.: Aphelandra longiflora",
+                                  :required=>true,
+                                  :type=>"string",
+                                  :paramType=>"path"
+                              }
+                          ],
+                          :execute=> Proc.new{ |params|
+                            r=search(settings.db_test,'occurrence',"scientificName:\"#{params["scientificName"]}\"")
+                            r
+                          }
+                      }
+                  ]
               }
             ]
         },
@@ -254,7 +278,7 @@ es = Sinatra::Application.settings.elasticsearch
                     :operations=>[
                          {
                              :method=>"GET",
-                             :summary=>"Return published assessment for taxon",
+                             :summary=>"Return assessment from endemicas_rio_de_janeiro for taxon",
                              :nickname=>"assessmentForTaxon",
                              :type=>"Assessment",
                              :parameters=>[
@@ -348,7 +372,7 @@ es = Sinatra::Application.settings.elasticsearch
                     :operations=>[
                          {
                              :method=>"GET",
-                             :summary=>"Return published profile for taxon",
+                             :summary=>"Return profile from endemicas_rio_de_janeiro for taxon",
                              :nickname=>"profileForTaxon",
                              :type=>"profile",
                              :parameters=>[
