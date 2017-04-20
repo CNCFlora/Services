@@ -250,12 +250,13 @@ es = Sinatra::Application.settings.elasticsearch
                                taxonomy = taxonomy(params["taxon"].gsub("+"," "))
 
                                names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
-                               if !taxonomy.nil?
-                                 names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{taxonomy["scientificNameWithoutAuthorship"]}\""
-                                 taxonomy["synonyms"].each {|syn|
-                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
-                                 }
-                               end
+                               #search not including synonyms
+                              #  if !taxonomy.nil?
+                              #    names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{taxonomy["scientificNameWithoutAuthorship"]}\""
+                              #    taxonomy["synonyms"].each {|syn|
+                              #      names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
+                              #    }
+                              #  end
 
                                names.each {|name|
                                    names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{name}\""
