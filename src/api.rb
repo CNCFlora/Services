@@ -137,6 +137,30 @@ es = Sinatra::Application.settings.elasticsearch
                           }
                       }
                   ]
+              },
+              {
+                  :path=>"/../occurrences/3scientificName/{scientificName}",
+                  :operations=>[
+                       {
+                           :method=>"GET",
+                           :summary=>"Return occurrences from especies_novas publics for taxon",
+                           :nickname=>"occurrencesForTaxon",
+                           :type=>"Occurrences",
+                           :parameters=>[
+                               {
+                                  :name=>"scientificName",
+                                  :description=>"Specie scientific name, without author. Eg.: Aphelandra longiflora",
+                                  :required=>true,
+                                  :type=>"string",
+                                  :paramType=>"path"
+                              }
+                          ],
+                          :execute=> Proc.new{ |params|
+                            r=search(settings.db_test2,'occurrence',"scientificName:\"#{params["scientificName"]}\"")
+                            r
+                          }
+                      }
+                  ]
               }
             ]
         },
@@ -317,6 +341,50 @@ es = Sinatra::Application.settings.elasticsearch
                             }
                         }
                     ]
+                },
+                {
+                    :path=>"/../assessments/3taxon/{taxon}",
+                    :operations=>[
+                         {
+                             :method=>"GET",
+                             :summary=>"Return assessment from novas_especies public for taxon",
+                             :nickname=>"assessmentForTaxon",
+                             :type=>"Assessment",
+                             :parameters=>[
+                                 {
+                                    :name=>"taxon",
+                                    :description=>"Specie scientific name, without author. Eg.: Aphelandra longiflora",
+                                    :required=>true,
+                                    :type=>"string",
+                                    :paramType=>"path"
+                                }
+                            ],
+                            :execute=> Proc.new{ |params|
+                               names = aka(params['taxon'].gsub("+"," "))
+                               taxonomy = taxonomy(params["taxon"].gsub("+"," "))
+
+                               names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
+                               if !taxonomy.nil?
+                                 names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{taxonomy["scientificNameWithoutAuthorship"]}\""
+                                 taxonomy["synonyms"].each {|syn|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
+                                 }
+                               end
+                               names.each {|name|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{name}\""
+                               }
+
+                               query = "(metadata.status:\"published\" OR metadata.status:\"comments\") AND (#{names_query})"
+                               r=search(settings.db_test2,'assessment',query)[0]
+
+                               if !r.nil?
+                                 r["taxon"]["current"]=taxonomy
+                               end
+                               r
+
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -404,6 +472,50 @@ es = Sinatra::Application.settings.elasticsearch
                                query = "metadata.status:\"done\" AND ( #{names_query} )"
 
                                r=search(settings.db_test,'profile',query)[0]
+                               if !r.nil?
+                                 r["taxon"]["current"]=taxonomy
+                               end
+                               r
+                            }
+                        }
+                    ]
+                },
+                {
+                    :path=>"/../profiles/3taxon/{taxon}",
+                    :operations=>[
+                         {
+                             :method=>"GET",
+                             :summary=>"Return profile from novas_especies publics for taxon",
+                             :nickname=>"profileForTaxon",
+                             :type=>"profile",
+                             :parameters=>[
+                                 {
+                                    :name=>"taxon",
+                                    :description=>"Specie scientific name, without author. Eg.: Aphelandra longiflora",
+                                    :required=>true,
+                                    :type=>"string",
+                                    :paramType=>"path"
+                                }
+                            ],
+                            :execute=> Proc.new{ |params|
+                               names = aka(params['taxon'].gsub("+",""))
+                               taxonomy = taxonomy(params["taxon"].gsub("+"," "))
+
+                               names_query = "taxon.scientificNameWithoutAuthorship:\"#{params["taxon"].gsub("+"," ")}\""
+                               if !taxonomy.nil?
+                                 names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{taxonomy["scientificNameWithoutAuthorship"]}\""
+                                 taxonomy["synonyms"].each {|syn|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{syn["scientificNameWithoutAuthorship"]}\""
+                                 }
+                               end
+
+                               names.each {|name|
+                                   names_query = "#{names_query} OR taxon.scientificNameWithoutAuthorship:\"#{name}\""
+                               }
+
+                               query = "metadata.status:\"done\" AND ( #{names_query} )"
+
+                               r=search(settings.db_test2,'profile',query)[0]
                                if !r.nil?
                                  r["taxon"]["current"]=taxonomy
                                end
